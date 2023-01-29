@@ -1,5 +1,63 @@
 library(nycflights13)
 library(tidyverse)
+library(patchwork)
+
+##flight_avg_per_day
+flight_avg_per_day <-flights%>%
+    select(year,month,day,origin)%>%
+    group_by(year,month,day,origin)%>%
+    summarise(total = n())%>%
+    ungroup()%>%
+    mutate(day_name = c(rep(c("Tuesday","Tuesday","Tuesday","Wednesday","Wednesday","Wednesday","Thursday","Thursday","Thursday","Friday","Friday","Friday","Saturday","Saturday","Saturday","Sunday","Sunday","Sunday","Monday","Monday","Monday"),52),"Tuesday","Tuesday","Tuesday"))%>%
+    group_by(day_name,origin)%>%
+    summarise(count =n(),
+              total = sum(total),
+              avg = total/count)
+
+ggplot(flight_avg_per_day, aes(day_name,avg))+
+    geom_bar(stat = "identity",aes(fill = factor(day_name)))+
+    facet_wrap(~origin,ncol =1)+
+    ylim(0,500)+
+    labs(title = "Average people in each name and each airport 2013",
+         x = "days",
+         y = "average_people",
+         caption = "Source : nycflights13 package",
+         fill = "Day\n")+
+    theme(plot.title =  element_text(size = 20))
+
+test2 <- flight_avg_per_day %>%
+    group_by(day_name) %>%
+    summarise(avg = sum(avg)) %>%
+    arrange(desc(avg))
+test2$day_name <- factor(test2$day_name,
+                         levels = test2$day_name)
+ggplot(test2, aes(day_name,avg))+
+    geom_bar(stat = "identity",aes(fill = factor(day_name)))+
+    ylim(0,1200)+
+    labs(title = "Average people each name day at LGA airport 2013",
+         x = "days",
+         y = "average_people",
+         caption = "Source : nycflights13 package",
+         fill = "Day\n")+
+    theme(plot.title =  element_text(size = 20))
+
+##Competition in each airport
+carrier_num <- flights %>%
+    count(carrier)%>%
+    arrange(desc(n))
+
+carrier_num
+
+ggplot(flights,aes(x=reorder(carrier,carrier,
+                             function(x)-length(x))))+
+    geom_bar()+
+    facet_wrap(~origin)+
+    labs(title = "flight per airline each airport 2013",
+         x = "airlines",
+         y = "total flights",
+         caption = "Source : nycflights13 package")+
+    theme(plot.title =  element_text(size = 20))
+
 ##delay
 delay <-flights %>%
     filter(origin == "LGA") %>%
@@ -106,42 +164,5 @@ ggplot(seat_LGA,aes(carrier,seat_per_plane))+
          x = "carrier",
          y = "seat_per_plane",
          caption = "Source : nycflights13 package")+
-    theme(plot.title =  element_text(size = 20))
-
-##flight_avg_per_day
-flight_avg_per_day <-flights%>%
-    select(year,month,day,origin)%>%
-    group_by(year,month,day,origin)%>%
-    summarise(total = n())%>%
-    ungroup()%>%
-    mutate(day_name = c(rep(c("Tuesday","Tuesday","Tuesday","Wednesday","Wednesday","Wednesday","Thursday","Thursday","Thursday","Friday","Friday","Friday","Saturday","Saturday","Saturday","Sunday","Sunday","Sunday","Monday","Monday","Monday"),52),"Tuesday","Tuesday","Tuesday"))%>%
-    group_by(day_name,origin)%>%
-    summarise(count =n(),
-              total = sum(total),
-              avg = total/count)
-
-ggplot(flight_avg_per_day, aes(day_name,avg))+
-    geom_bar(stat = "identity",aes(fill = factor(day_name)))+
-    facet_wrap(~origin,ncol =1)+
-    ylim(0,500)+
-    labs(title = "Average people in each name and each airport 2013",
-         x = "days",
-         y = "average_people",
-         caption = "Source : nycflights13 package",
-         fill = "Day\n")+
-    theme(plot.title =  element_text(size = 20))
-
-test2 <- flight_avg_per_day
-test2$day_name <- factor(test2$day_name,
-                         levels = c("Monday","Wednesday","Thursday","Friday","Tuesday",
-                                    "Sunday","Saturday"))
-ggplot(test2, aes(day_name,avg))+
-    geom_bar(stat = "identity",aes(fill = factor(day_name)))+
-    ylim(0,500)+
-    labs(title = "Average people each name day at LGA airport 2013",
-         x = "days",
-         y = "average_people",
-         caption = "Source : nycflights13 package",
-         fill = "Day\n")+
     theme(plot.title =  element_text(size = 20))
 
