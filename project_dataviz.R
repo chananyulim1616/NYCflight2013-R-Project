@@ -45,9 +45,6 @@ ggplot(test2, aes(day_name,avg))+
 carrier_num <- flights %>%
     count(carrier)%>%
     arrange(desc(n))
-
-carrier_num
-
 ggplot(flights,aes(x=reorder(carrier,carrier,
                              function(x)-length(x))))+
     geom_bar()+
@@ -58,50 +55,25 @@ ggplot(flights,aes(x=reorder(carrier,carrier,
          caption = "Source : nycflights13 package")+
     theme(plot.title =  element_text(size = 20))
 
-##delay
-delay <-flights %>%
-    filter(origin == "LGA") %>%
-    select(4:9,10,15:16)%>%
-    mutate(delay = ifelse(arr_delay+dep_delay>0,TRUE,FALSE))%>%
-    filter(is.na(delay) == FALSE)%>%
-    group_by(carrier) %>%
-    summarise(total_flight = n(),
-              delay = sum(delay,na.rm = TRUE),
-              avg_arr_come =mean(arr_delay+dep_delay,na.rm = TRUE),
-              avg_arr_delay =mean(ifelse(arr_delay+dep_delay> 15,arr_delay+dep_delay,0),na.rm = TRUE),
-              delay_ratio = delay/total_flight) %>%
-    select(1:2,4:6)%>%
-    arrange(avg_arr_come,avg_arr_delay)
+##zoom to LGA
 
-ggplot(delay,aes(total_flight,avg_arr_delay))+
-    geom_point(size = 3)+
-    geom_smooth(method = "lm")+
-    labs(title = "Corelation about total flight and average delay each airline at LGA airport 2013",
-         x = "total_flights",
-         y = "averange delay",
-         caption = "Source : nycflights13 package")+
-    theme(plot.title =  element_text(size = 15))
+flights_LGA <- flights %>%
+    filter(origin == "LGA",carrier %in% LGA$carrier)%>%
+    group_by(carrier)%>%
+    summarise(n = n())%>%
+    arrange(desc(n))
 
+flights_LGA$carrier <- factor(flights_LGA$carrier,
+                              levels = flights_LGA$carrier)
 
-gr1 <- ggplot(delay)+
-    geom_point(data = delay,aes(x = carrier,y = delay_ratio),size = 4,color ="red")+
-    geom_line(data = delay,aes(x = carrier,y = delay_ratio),color = "black",size = 1,group = 1)+
-    ylim(c(0.1,0.8))+
-    labs(title = "Delay Ratio each airline at LGA airport 2013",
-         x = "Carrier",
-         y = "Delay_Ratio",
+ggplot(flights_LGA,aes(x = carrier,y=n,fill = factor(carrier))) +
+    geom_bar(stat = "identity")+
+    labs(title = "flight per airline at LGA airport 2013",
+         x = "airlines",
+         y = "total flights",
+         fill = "Airlines",
          caption = "Source : nycflights13 package")+
     theme(plot.title =  element_text(size = 20))
-
-gr2 <- ggplot(delay,aes(carrier,total_flight))+
-    geom_bar(stat = "identity",fill ="#5875e8")+
-    labs(title = "Total flight each airlines at LGA airport 2013",
-         x = "Carrier",
-         y = "Total_Flights",
-         caption = "Source : nycflights13 package")+
-    theme(plot.title =  element_text(size = 20))
-
-gr1+gr2
 
 ##dest_LGA
 dest_LGA <- flights %>%
@@ -123,6 +95,23 @@ ggplot(dest_LGA,aes(dest,total_flight))+
          fill = "Destination")+
     theme(plot.title =  element_text(size = 20))
 
+##check
+check1 <- flights %>%
+    filter(origin == "LGA", dest %in% dest_LGA$dest[1:5])%>%
+    group_by(carrier,dest)%>%
+    summarise(total_flight = n())%>%
+    arrange(desc(total_flight))
+
+check1$carrier <- factor(check1$carrier,
+                         levels = flights_LGA$carrier)
+ggplot(check1,aes(carrier,total_flight,fill=dest))+
+    geom_bar(stat = "identity")+
+    labs(title = "Total flight Top 5 destination each airlines at LGA Airport 2013",
+         x = "airlines",
+         y = "Total_Flights",
+         caption = "Source : nycflights13 package",
+         fill = "Airlines")+
+    theme(plot.title =  element_text(size = 20))
 
 ##total_plane
 tailnum_air <- flights%>%
@@ -132,6 +121,9 @@ tailnum_air <- flights%>%
     summarise(total_plane = n_distinct(tailnum))%>%
     arrange(desc(total_plane))
 
+tailnum_air$carrier <- factor(tailnum_air$carrier,
+                              levels = flights_LGA$carrier)
+
 ggplot(tailnum_air,aes(carrier,total_plane))+ 
     geom_bar(stat="identity",fill="#5ec8d8")+
     labs(title = "Total plane each airline at LGA airport 2013",
@@ -139,7 +131,6 @@ ggplot(tailnum_air,aes(carrier,total_plane))+
          y = "Total_Planes",
          caption = "Source : nycflights13 package")+
     theme(plot.title =  element_text(size = 20))
-
 
 ##seat_per_airline
 tail_LGA <- flights %>%
@@ -165,4 +156,63 @@ ggplot(seat_LGA,aes(carrier,seat_per_plane))+
          y = "seat_per_plane",
          caption = "Source : nycflights13 package")+
     theme(plot.title =  element_text(size = 20))
+#check
+seat_LGA$carrier = factor(seat_LGA$carrier,
+                          levels = flights_LGA$carrier)
+
+ggplot(seat_LGA,aes(carrier,seat_per_plane))+ 
+    geom_bar(stat="identity",fill="#5ec8d8")+
+    labs(title = "Seat per plane each airline at LGA airport 2013",
+         x = "carrier",
+         y = "seat_per_plane",
+         caption = "Source : nycflights13 package")+
+    theme(plot.title =  element_text(size = 20))
+
+
+##delay
+delay <-flights %>%
+    filter(origin == "LGA") %>%
+    select(4:9,10,15:16)%>%
+    mutate(delay = ifelse(arr_delay+dep_delay>0,TRUE,FALSE))%>%
+    filter(is.na(delay) == FALSE)%>%
+    group_by(carrier) %>%
+    summarise(total_flight = n(),
+              delay = sum(delay,na.rm = TRUE),
+              avg_arr_come =mean(arr_delay+dep_delay,na.rm = TRUE),
+              avg_arr_delay =mean(ifelse(arr_delay+dep_delay> 15,arr_delay+dep_delay,0),na.rm = TRUE),
+              delay_ratio = delay/total_flight) %>%
+    select(1:2,4:6)%>%
+    arrange(avg_arr_come,avg_arr_delay)
+
+ggplot(delay,aes(total_flight,avg_arr_delay))+
+    geom_point(size = 3)+
+    geom_smooth(method = "lm")+
+    labs(title = "Corelation about total flight and average delay each airline at LGA airport 2013",
+         x = "total_flights",
+         y = "averange delay",
+         caption = "Source : nycflights13 package")+
+    theme(plot.title =  element_text(size = 15))
+delay$carrier <- factor(delay$carrier,
+                        levels = flights_LGA$carrier)
+
+gr1 <- ggplot(delay)+
+    geom_point(data = delay,aes(x = carrier,y = delay_ratio),size = 4,color ="red")+
+    geom_line(data = delay,aes(x = carrier,y = delay_ratio),color = "black",size = 1,group = 1)+
+    ylim(c(0.1,0.8))+
+    labs(title = "Delay Ratio each airline at LGA airport 2013",
+         x = "Carrier",
+         y = "Delay_Ratio",
+         caption = "Source : nycflights13 package")+
+    theme(plot.title =  element_text(size = 20))
+
+gr2 <- ggplot(delay,aes(carrier,total_flight))+
+    geom_bar(stat = "identity",fill ="#5875e8")+
+    labs(title = "Total flight each airlines at LGA airport 2013",
+         x = "Carrier",
+         y = "Total_Flights",
+         caption = "Source : nycflights13 package")+
+    theme(plot.title =  element_text(size = 20))
+
+gr1+gr2
+
 
