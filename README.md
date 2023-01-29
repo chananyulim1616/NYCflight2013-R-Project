@@ -11,7 +11,7 @@ Training in using dplyr and GGplot.
 
 1. Download all requirement
 2. Download all file
-3. run [project_dataviz.R](https://github.com/chananyulim1616/Typewriter-Project/blob/main/keyboard.py)
+3. run [project_dataviz.R](https://github.com/chananyulim1616/NYCflight2013-R-Project/blob/main/project_dataviz.R)
 
 ## What we found
 
@@ -52,6 +52,6 @@ The number of aircraft and seats per machine were also compared, but there was f
 
 Finally, the total number of flights was analyzed against average delay time and found to be directly related. Airlines with higher average delays have fewer flights, and conversely, airlines with more flights have lower average delays. However, the relationship between the number of flights and average birth rate was not observed.
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/568fde6f-ef33-4ab6-886c-7b070f159242/Untitled.png)
+![image](https://user-images.githubusercontent.com/78534217/215352987-3daadfec-7c30-4a3f-972f-e4b0f288eaa4.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bd653abf-18d8-4f34-9c46-a0de2ea6d2a3/Untitled.png)
+![image](https://user-images.githubusercontent.com/78534217/215352970-ad8f324a-e4d8-49a7-88be-26836a240bbb.png)
