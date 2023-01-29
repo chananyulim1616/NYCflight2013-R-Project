@@ -30,7 +30,7 @@ By analyzing flight data, it was determined that the LGA airport has the highest
 
 ![image](https://user-images.githubusercontent.com/78534217/215353076-21bb5aa6-bbf2-4749-b516-7a7aa75bf677.png)
 
-By analyzing flight data, it was determined that the LGA airport has the highest level of competition among airlines. The top five most visited destinations from LGA are ATL, ORD, CLT, MIA, and DTW.
+The top five most visited destinations from LGA are ATL, ORD, CLT, MIA, and DTW.
 
 ![image](https://user-images.githubusercontent.com/78534217/215353069-d492c093-4fa6-4cd7-a85f-db9bc68138ac.png)
 
